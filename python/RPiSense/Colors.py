@@ -2,8 +2,11 @@
 
 # https://github.com/dbullockphd/RPiSense
 
+from os import getenv
 from random import randint
 from numpy import uint8, where, genfromtxt
+
+colorscsv = getenv('RPiSenseDir') + '/python/RPiSense/colors.csv'
 
 class Colors (object):
     """
@@ -12,7 +15,7 @@ class Colors (object):
     """
 
     def __init__ (self, order=('H','L','S'), ascending=True):
-        self.colors = genfromtxt ('colors.csv',
+        self.colors = genfromtxt (colorscsv,
                                   dtype=[('r',uint8), ('g',uint8), ('b',uint8),
                                          ('h',uint8), ('s',uint8), ('v',uint8),
                                          ('H',uint8), ('L',uint8), ('S',uint8),

@@ -37,7 +37,7 @@ mkdir -p /home/pi/src
 git clone https://github.com/dbullockphd/RPiSense
 ```
 
-Sense HAT has a Python API that allows you to communicate with it easily. This installation is required for `RPiSense` to work.
+Sense HAT has a Python API that allows you to communicate with it easily. This installation is required for `RPiSense` to work, so make sure you have it.
 
 ```bash
 sudo apt-get install sense-hat
@@ -69,7 +69,7 @@ sudo apt-get install arduino
 Part of the computer programming course is to map some weather programs, so `matplotlib` is also recommended:
 
 ```
-sudo pip install matplotlib
+sudo pip install python-matplotlib
 ```
 
 ### Environment Variables
@@ -80,9 +80,9 @@ To take advantage of the macros on the system, it is recommended that you add a 
 echo "source /home/pi/src/RPiSense/setup.sh" >> /home/pi/.bash_aliases
 ```
 
-## Macro
+## Macros
 
-The main purpose of `RPiSense` is to have a macro for the Sense HAT that can quickly demonstrate some of the features of the Sense Hat. This section covers some of the commands that you can use.
+The main purpose of `RPiSense` is to have macros for the Sense HAT that can quickly demonstrate some of the features of the Sense Hat. This section covers some of the commands that you can use.
 
 Type the following into a Terminal window and observe the results:
 
@@ -114,6 +114,8 @@ The macros also have a few options defined by the macro. If you are not sure wha
 ```bash
 sensehat --help
 ```
+
+The most important for demonstrations are `--fg` and `--bg` options, which are the foreground and background colors, respectively. When a macro calls for text to be displayed, it will be shown in the foreground color on top of a background color.
 
 ## Classes and Functions
 
@@ -155,6 +157,8 @@ print c1.random (mode='rgb')
 print c1.random (mode='rgb')
 ```
 
+This class was written to support several commands in the `sensehat` macro.
+
 ### Compass.py
 
 This class takes raw information from the compass and displays a red dot in the direction of North along a blue circle.
@@ -170,6 +174,12 @@ c.Update ()
 ```
 
 The Sense HAT returns a three-dimensional vector toward North. This class automaticaly projects that into a the 2D axis of the LED matrix.
+
+This class can also be called from the macro:
+
+```bash
+sensehat compass
+```
 
 ### Convert.py
 
@@ -189,6 +199,8 @@ from RPiSense.Convert import mbar2inHg
 print mbar2inHg (940)
 ```
 
+This class was written to support the `temperature` and `pressure` commands in the `sensehat` macro.
+
 ### Level.py
 
 This class mimics the behavior of a bubble-leveler. A white dot on the LED matrix will drift "upwards".
@@ -201,6 +213,12 @@ from RPiSense.Level import Level
 sense = SenseHat ()
 l = Level (sense, scale=30)
 l.Update ()
+```
+
+This class can also be called from the macro:
+
+```bash
+sensehat level
 ```
 
 ### MakeyJoy.py
@@ -217,6 +235,9 @@ mj = MakeyJoy (sense, makey=False)
 print mj.GetEvent ()
 ```
 
+This class was written to support the `repeat` command in the `sensehat` macro.
+
+
 ### RepeatMe.py
 
 The LED matrix opens up a lot of possibilities for designing visual games. A simple demonstration is a game of repetition. Colored squares light up on the LED matrix in one of four directions (up, down, left, right) in sequence and you have to memorize the sequence and then repeat it. This class uses the `MakeyJoy` class, so you have the option of entering the sequence in on a keyboard or with the joystick.
@@ -228,4 +249,10 @@ from sense_hat import SenseHat
 from RPiSense.RepeatMe import RepeatMe
 sense = SenseHat ()
 rm = RepeatMe (sense, t=0.5, makey=False)
+```
+
+This class can also be called from the macro:
+
+```bash
+sensehat repeat
 ```

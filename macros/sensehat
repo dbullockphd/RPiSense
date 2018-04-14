@@ -6,9 +6,25 @@ from RPiSense.Colors import Colors
 c = Colors ()
 
 p = AP (description='quick control over the Sense Hat')
-p.add_argument ('cmd', default='clear', help='command to run')
-p.add_argument ('--fg', default=c['white'], help='foreground color')
-p.add_argument ('--bg', default=c['black'], help='background color')
+p.add_argument ('cmd', type=str, default='clear', help='command to run',
+                choices=('clear',
+                         'color',
+                         'letter',
+                         'scroll',
+                         'ip',
+                         'date',
+                         'time',
+                         'datetime',
+                         'temperature',
+                         'pressure',
+                         'humidity',
+                         'level',
+                         'compass',
+                         'repeat'))
+p.add_argument ('--fg', type=str, default=c['white'],
+                help='name of foreground color (can also be "random")')
+p.add_argument ('--bg', type=str, default=c['black'],
+                help='name of background color (can also be "random")')
 p.add_argument ('--char', default='X', help='character to display')
 p.add_argument ('--message', nargs='+', help='message to display')
 p.add_argument ('--time', type=float, default=2,

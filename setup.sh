@@ -1,4 +1,5 @@
 #!/bin/sh
 
-export PATH=/home/pi/src/RPiSense/macros:$PATH
-export PYTHONPATH=/home/pi/src/RPiSense/python:$PYTHONPATH
+export RPiSenseDir=/home/pi/src/RPiSense
+export PATH=$RPiSenseDir/macros:$PATH
+export PYTHONPATH=$RPiSenseDir/python:$PYTHONPATH
