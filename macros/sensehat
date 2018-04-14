@@ -1,0 +1,250 @@
+#!/usr/bin/env python
+
+from argparse import ArgumentParser as AP
+from RPiSense.Colors import Colors
+
+c = Colors ()
+
+p = AP (description='quick control over the Sense Hat')
+p.add_argument ('cmd', default='clear', help='command to run')
+p.add_argument ('--fg', default=c['white'], help='foreground color')
+p.add_argument ('--bg', default=c['black'], help='background color')
+p.add_argument ('--char', default='X', help='character to display')
+p.add_argument ('--message', nargs='+', help='message to display')
+p.add_argument ('--time', type=float, default=2,
+                help='duration (seconds) for display')
+p.add_argument ('--number', type=int, default=1,
+                help='number of times to display')
+p.add_argument ('--speed', type=float, default=0.05,
+                help='speed of text scroll')
+p.add_argument ('--dim', action='store_true', default=False,
+                help='force LED matrix dim')
+p.add_argument ('--convert', action='store_true', default=False,
+                help='convert to American units')
+p.add_argument ('--scale', type=int, default=30,
+                help='scale sensitivity')
+p.add_argument ('--led', action='store_true', default=False,
+                help='force display to LED matrix')
+p.add_argument ('--makey', action='store_true', default=False,
+                help='use keyboard (e.g. Makey Makey) for input')
+args = p.parse_args ()
+
+from os import popen
+from time import sleep
+from datetime import datetime, date
+from sense_hat import SenseHat
+from RPiSense.Convert import C2F, mbar2inHg
+from RPiSense.Level import Level
+from RPiSense.Compass import Compass
+from RPiSense.RepeatMe import RepeatMe
+
+if isinstance (args.fg, list) or isinstance (args.fg, tuple): fg = args.fg
+elif isinstance (args.fg, str) and args.fg != 'random': fg = c[args.fg]
+if isinstance (args.bg, list) or isinstance (args.bg, tuple): bg = args.bg
+elif isinstance (args.bg, str) and args.bg != 'random': bg = c[args.bg]
+
+sense = SenseHat ()
+sense.clear ()
+sense.low_light = args.dim
+
+if args.cmd == 'clear':
+    # the default behavior is to clear anyway
+    pass
+
+elif args.cmd == 'color':
+    # display a solid color on the LED matrix
+    for i in xrange(args.number):
+        if args.bg == 'random': bg = c.random()
+        sense.clear (bg)
+        sleep (args.time)
+        pass
+    sense.clear ()
+    pass
+
+elif args.cmd == 'letter':
+    # display one letter on the LED matrix
+    for i in xrange(args.number):
+        if args.fg == 'random': fg = c.random()
+        if args.bg == 'random': bg = c.random()
+        sense.show_letter (args.char, text_colour=fg, back_colour=bg)
+        sleep (args.time)
+        pass
+    sense.clear ()
+    pass
+
+elif args.cmd == 'scroll':
+    # scroll a text message across the LED matrix
+    for i in xrange(args.number):
+        if args.fg == 'random': fg = c.random()
+        if args.bg == 'random': bg = c.random()
+        sense.show_message (' '.join(args.message), text_colour=fg,
+                            back_colour=bg, scroll_speed=args.speed)
+        pass
+    sense.clear ()
+    pass
+
+elif args.cmd == 'ip':
+    # scroll the IP address across the LED matrix
+    for i in xrange(args.number):
+        with popen ('hostname -I') as f: IP = f.next().strip()
+        if args.led:
+            if args.fg == 'random': fg = c.random()
+            if args.bg == 'random': bg = c.random()
+            sense.show_message (IP, text_colour=fg, back_colour=bg,
+                                scroll_speed=args.speed)
+            pass
+        else:
+            print IP
+            if args.number > 1: sleep (args.time)
+            pass
+        pass
+    sense.clear ()
+    pass
+
+elif args.cmd == 'date':
+    # scroll the current date across the LED matrix
+    for i in xrange(args.number):
+        now = date.today ()
+        msg = now.isoformat ()
+        if args.led:
+            if args.fg == 'random': fg = c.random()
+            if args.bg == 'random': bg = c.random()
+            sense.show_message (msg, text_colour=fg, back_colour=bg,
+                                scroll_speed=args.speed)
+            pass
+        else:
+            print msg
+            if args.number > 1: sleep (args.time)
+            pass
+        pass
+    sense.clear ()
+    pass
+
+elif args.cmd == 'time':
+    # scroll the current time across the LED matrix
+    for i in xrange(args.number):
+        if args.led:
+            if args.fg == 'random': fg = c.random()
+            if args.bg == 'random': bg = c.random()
+            now = datetime.now ()
+            msg = now.strftime ('%I:%M:%S %p')
+            sense.show_message (msg, text_colour=fg, back_colour=bg,
+                                scroll_speed=args.speed)
+            pass
+        else:
+            now = datetime.now ()
+            print now.strftime ('%I:%M:%S %p')
+            if args.number > 1: sleep (args.time)
+            pass
+        pass
+    sense.clear ()
+    pass
+
+elif args.cmd == 'datetime':
+    # scroll both the date and the time across the LED matrix
+    for i in xrange(args.number):
+        if args.led:
+            if args.fg == 'random': fg = c.random()
+            if args.bg == 'random': bg = c.random()
+            now = datetime.now ()
+            msg = now.strftime ('%Y-%m-%d')
+            sense.show_message (msg, text_colour=fg, back_colour=bg,
+                                scroll_speed=args.speed)
+            now = datetime.now ()
+            msg = now.strftime ('%I:%M:%S %p')
+            sense.show_message (msg, text_colour=fg, back_colour=bg,
+                                scroll_speed=args.speed)
+            pass
+        else:
+            now = datetime.now ()
+            print now.strftime ('%Y-%m-%d')
+            print now.strftime ('%I:%M:%S %p')
+            if args.number > 1: sleep (args.time)
+            pass
+        pass
+    sense.clear ()
+    pass
+
+elif args.cmd == 'temperature':
+    # display the current temperature
+    for i in xrange(args.number):
+        t = sense.get_temperature ()
+        if args.convert: t = C2F (t)
+        if args.led:
+            if args.fg == 'random': fg = c.random()
+            if args.bg == 'random': bg = c.random()
+            msg = '%i ' % t
+            if args.convert: msg += 'F'
+            else: msg += 'C'
+            sense.show_message (msg, text_colour=fg, back_colour=bg,
+                                scroll_speed=args.speed)
+            pass
+        else:
+            print t,
+            if args.convert: print 'Fahrenheit'
+            else: print 'Celsius'
+            if args.number > 1: sleep (args.time)
+            pass
+        pass
+    pass
+
+elif args.cmd == 'pressure':
+    # display the current pressure
+    for i in xrange(args.number):
+        p = sense.get_pressure ()
+        if args.convert: p = mbar2inHg (p)
+        if args.led:
+            if args.fg == 'random': fg = c.random()
+            if args.bg == 'random': bg = c.random()
+            msg = '%i ' % p
+            if args.convert: msg += 'inHg'
+            else: msg += 'mbar'
+            sense.show_message (msg, text_colour=fg, back_colour=bg,
+                                scroll_speed=args.speed)
+            pass
+        else:
+            print p,
+            if args.convert: print 'inches of mercury'
+            else: print 'millibars'
+            if args.number > 1: sleep (args.time)
+            pass
+        pass
+    pass
+
+elif args.cmd == 'humidity':
+    # display the current humidity
+    for i in xrange(args.number):
+        h = sense.get_humidity ()
+        if args.led:
+            if args.fg == 'random': fg = c.random()
+            if args.bg == 'random': bg = c.random()
+            msg = '%i' % h + '%'
+            sense.show_message (msg, text_colour=fg, back_colour=bg,
+                                scroll_speed=args.speed)
+            pass
+        else:
+            print h, '%'
+            if args.number > 1: sleep (args.time)
+            pass
+        pass
+    pass
+
+elif args.cmd == 'level':
+    # show the tilt of the Sense HAT
+    # as if it had an air bubble suspended in water
+    l = Level (sense, args.scale)
+    while True: l.Update ()
+    pass
+
+elif args.cmd == 'compass':
+    # show the direction of North
+    c = Compass (sense)
+    while True: c.Update ()
+    pass
+
+elif args.cmd == 'repeat':
+    # play a repetition game
+    r = RepeatMe (sense, 0.5, args.makey)
+    pass
+
+else: print 'unknown command', args.cmd
