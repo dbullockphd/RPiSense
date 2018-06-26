@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>RPiSense.MakeyJoy &mdash; RPiSense latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="RPiSense latest documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> RPiSense
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                stable
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">RPiSense Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">RPiSense Tutorial</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">RPiSense</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>RPiSense.MakeyJoy</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for RPiSense.MakeyJoy</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># https://github.com/dbullockphd/RPiSense</span>
+
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">tty</span><span class="o">,</span> <span class="nn">termios</span>
+
+<div class="viewcode-block" id="MakeyJoy"><a class="viewcode-back" href="../../RPiSense.html#RPiSense.MakeyJoy.MakeyJoy">[docs]</a><span class="k">class</span> <span class="nc">MakeyJoy</span> <span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a direction of input from either the joystick or the keyboard.</span>
+
+<span class="sd">    :param sense: (`SenseHat` instance)</span>
+<span class="sd">        A reference to the SenseHat API</span>
+
+<span class="sd">    :param makey: (`boolean`)</span>
+<span class="sd">        Use Makey Makey (or keyboard) arrows instead of the Sense HAT joystick.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sense</span><span class="p">,</span> <span class="n">makey</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sense</span> <span class="o">=</span> <span class="n">sense</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__makey</span> <span class="o">=</span> <span class="n">makey</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="MakeyJoy.GetEvent"><a class="viewcode-back" href="../../RPiSense.html#RPiSense.MakeyJoy.MakeyJoy.GetEvent">[docs]</a>    <span class="k">def</span> <span class="nf">GetEvent</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the event and intepret it as a direction.</span>
+
+<span class="sd">        :return:</span>
+
+<span class="sd">            - **direction** (`string`) -- The arrow event, i.e. &#39;up&#39;, &#39;down&#39;, &#39;left&#39;, or &#39;right.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__makey</span><span class="p">:</span>
+            <span class="c1"># read keyboard direction</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getch</span> <span class="p">()</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;blank&#39;</span>
+                    <span class="k">pass</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\x1b</span><span class="s1">[A&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;up&#39;</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\x1b</span><span class="s1">[B&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;down&#39;</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\x1b</span><span class="s1">[C&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;right&#39;</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\x1b</span><span class="s1">[D&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;left&#39;</span>
+                <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">k</span>
+                <span class="k">pass</span>
+            <span class="k">pass</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># read joystick direction</span>
+            <span class="c1"># only count movements toward a direction</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sense</span><span class="o">.</span><span class="n">stick</span><span class="o">.</span><span class="n">wait_for_event</span> <span class="p">()</span>
+                <span class="c1"># only return forced direction</span>
+                <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;released&#39;</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;middle&#39;</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">return</span> <span class="n">event</span><span class="o">.</span><span class="n">direction</span>
+            <span class="k">pass</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">__getch</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># read keyboard press</span>
+        <span class="n">fd</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">fileno</span> <span class="p">()</span>
+        <span class="n">old_settings</span> <span class="o">=</span> <span class="n">termios</span><span class="o">.</span><span class="n">tcgetattr</span> <span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tty</span><span class="o">.</span><span class="n">setraw</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
+            <span class="n">ch</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># some characters are 3-tuples</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\x1b</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">ch</span> <span class="o">+=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">pass</span>
+        <span class="k">finally</span><span class="p">:</span> <span class="n">termios</span><span class="o">.</span><span class="n">tcsetattr</span> <span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">termios</span><span class="o">.</span><span class="n">TCSADRAIN</span><span class="p">,</span> <span class="n">old_settings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ch</span>
+    <span class="k">pass</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">argparse</span> <span class="k">import</span> <span class="n">ArgumentParser</span> <span class="k">as</span> <span class="n">AP</span>
+    <span class="kn">from</span> <span class="nn">sense_hat</span> <span class="k">import</span> <span class="n">SenseHat</span>
+
+    <span class="c1"># get the direction of the joystick or keyboard arrows</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">AP</span> <span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;activate RepeatMe&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span> <span class="p">(</span><span class="s1">&#39;--makey&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;use keyboard (e.g. Makey Makey) as input&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span> <span class="p">(</span><span class="s1">&#39;--dim&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;force LED matrix dim&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">parse_args</span> <span class="p">()</span>
+
+    <span class="c1"># start a new session with the Sense HAT</span>
+    <span class="n">sense</span> <span class="o">=</span> <span class="n">SenseHat</span> <span class="p">()</span>
+    <span class="n">sense</span><span class="o">.</span><span class="n">clear</span> <span class="p">()</span>
+    <span class="n">sense</span><span class="o">.</span><span class="n">low_light</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">dim</span>
+
+    <span class="c1"># start the class and wait for an arrow input</span>
+    <span class="n">keyin</span> <span class="o">=</span> <span class="n">MakeyJoy</span> <span class="p">(</span><span class="n">sense</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">makey</span><span class="p">)</span>
+    <span class="n">event</span> <span class="o">=</span> <span class="n">keyin</span><span class="o">.</span><span class="n">GetEvent</span> <span class="p">()</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="n">event</span><span class="p">)</span>
+    <span class="k">pass</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, dbullockphd.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'latest',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
