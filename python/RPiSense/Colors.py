@@ -17,7 +17,7 @@ class Colors (object):
         Sorting can either be ascending or descending.
     """
 
-    __colorscsv = '/home/pi/src/RPiSense/config/colors.csv'
+    __colorscsv = '/home/pi/src/RPiSense/configs/colors.csv'
 
     def __init__ (self, order=('H','L','S'), ascending=True):
         self.colors = genfromtxt (self.__colorscsv,
