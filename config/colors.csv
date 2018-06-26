@@ -1,4 +1,4 @@
-# r,g,b,h,s,v,H,L,S,name
+# red, green, blue, hue, saturation, value, HUE, LUMINOSITY, SATURATION, name
 0,0,0,0,0,0,0,0,0,black
 128,0,0,0,255,128,0,64,255,maroon
 139,0,0,0,255,139,0,69,255,darkred

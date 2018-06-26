@@ -6,16 +6,21 @@ from os import getenv
 from random import randint
 from numpy import uint8, where, genfromtxt
 
-colorscsv = getenv('RPiSenseDir') + '/python/RPiSense/colors.csv'
-
 class Colors (object):
     """
-    Keep a list of colors organized and sorted. You can select colors by name,
-    by index number, and even at random.
+    Keep a list of colors organized and sorted. You can select colors by name, by index number, and even at random.
+
+    :param order: (`array_like`)
+        This defines the hierarchy of field names when sorting. See the colors.csv file for information about these names.
+
+    :param ascending: (`boolean`)
+        Sorting can either be ascending or descending.
     """
 
+    __colorscsv = '/home/pi/src/RPiSense/config/colors.csv'
+
     def __init__ (self, order=('H','L','S'), ascending=True):
-        self.colors = genfromtxt (colorscsv,
+        self.colors = genfromtxt (self.__colorscsv,
                                   dtype=[('r',uint8), ('g',uint8), ('b',uint8),
                                          ('h',uint8), ('s',uint8), ('v',uint8),
                                          ('H',uint8), ('L',uint8), ('S',uint8),
@@ -27,26 +32,101 @@ class Colors (object):
         pass
 
     def random (self, low=-1, high=-1, mode='rgb'):
+        """
+        Select a color at random.
+
+        :param low: (`integer`)
+            The lowest index of the array to use. If `low=-1`, this defaults to the first index.
+
+        :param high: (`integer`)
+            The highest index of the array to use. If `high=-1`, this defaults to the last index.
+
+        :param mode: ('string')
+            This is a 3-character description for the color category to return. Valid options are 'rgb' (red, green, blue), 'hsv' (hue, saturation, value), and 'HLS' (HUE, LUMINOSITY, SATURATION).
+
+        :return:
+
+            - **name** (`string`) -- The name of the color.
+
+            - **abc** (`tuple`) -- Three 8-bit values for the color.
+        """
+        
         # pick a random color between low and high
         if low < 0: low = 0
         if high < 0: high = self.colors.shape[0]
         i = randint (low, high-1)
-        rgb = self._get (i, mode)
-        return rgb
+        name, abc = self.__get (i, mode)
+        return name, abc
+
+    def randomColor (self, low=-1, high=-1, mode='rgb'):
+        """
+        Select a color at random.
+
+        :param low: (`integer`)
+            The lowest index of the array to use. If `low=-1`, this defaults to the first index.
+
+        :param high: (`integer`)
+            The highest index of the array to use. If `high=-1`, this defaults to the last index.
+
+        :param mode: ('string')
+            This is a 3-character description for the color category to return. Valid options are 'rgb' (red, green, blue), 'hsv' (hue, saturation, value), and 'HLS' (HUE, LUMINOSITY, SATURATION).
+
+        :return:
+
+            - **abc** (`tuple`) -- Three 8-bit values for the color.
+        """
+
+        # get the tuple from the random method
+        name, abc = self.random (low, high, mode)
+        return abc
+
+    def randomName (self, low=-1, high=-1, mode='rgb'):
+        """
+        Select a color at random.
+
+        :param low: (`integer`)
+            The lowest index of the array to use. If `low=-1`, this defaults to the first index.
+
+        :param high: (`integer`)
+            The highest index of the array to use. If `high=-1`, this defaults to the last index.
+
+        :param mode: ('string')
+            This is a 3-character description for the color category to return. Valid options are 'rgb' (red, green, blue), 'hsv' (hue, saturation, value), and 'HLS' (HUE, LUMINOSITY, SATURATION).
+
+        :return:
+
+            - **name** (`string`) -- The name of the color.
+
+            - **abc** (`tuple`) -- Three 8-bit values for the color.
+        """
+
+        # get the name from the random method
+        name, abc = self.random (low, high, mode)
+        return name
 
     def fetch (self, key, mode='rgb'):
+        """
+        Select a color at random.
+
+        :param key: (`string`)
+            The name of the color to find.
+
+        :param mode: ('string')
+            This is a 3-character description for the color category to return. Valid options are 'rgb' (red, green, blue), 'hsv' (hue, saturation, value), and 'HLS' (HUE, LUMINOSITY, SATURATION).
+
+        :return:
+
+            - **abc** (`tuple`) -- Three 8-bit values for the color.
+        """
+        
         # get a color by name
         f = where (self.colors['name'] == key)
-        if len(f[0]) == 0:
-            print 'unknown color', key, 'returns None'
-            return None
-        else:
-            i = f[0][0]
-            rgb = self._get (i, mode)
-            return rgb
-        pass
+        if len(f[0]) == 0: raise ValueError ('color {0:s} unknown'.format(key))
+        i = f[0][0]
+        abc = self.__get (i, mode)
+        return abc
 
-    def _get (self, i, mode):
+    def __get (self, i, mode):
         # get color by mode
         if mode == 'rgb':
             a = self.colors['r'][i]
@@ -63,23 +143,32 @@ class Colors (object):
             b = self.colors['L'][i]
             c = self.colors['S'][i]
             pass
-        return (a, b, c)
+        name = self.colors['name'][i]
+        return name, (a, b, c)
 
     def __getitem__ (self, key):
         # dictionary-like name access
-        return self.fetch (key, 'rgb')
+        if key == 'random': return self.randomColor ()
+        else: return self.fetch (key, 'rgb')
+        pass
     pass
 
 if __name__ == '__main__':
     from argparse import ArgumentParser as AP
 
+    # get a color by name on the command line
     p = AP (description='get a color by name')
     p.add_argument ('color', default='random')
-    p.add_argument ('--dim', action='store_true', default=False,
-                    help='force LED matrix dim')
     args = p.parse_args ()
 
+    # get the color values
     c = Colors ()
-    if args.color == 'random': print c.random ()
-    else: print args.color, c[args.color]
+    if args.color == 'random': name, rgb = c.random ()
+    else:
+        name = args.color
+        rgb = c[args.color]
+        pass
+
+    # display the name of the color and its values
+    print ('{0:s}: {1:s}'.format (str(name), str(rgb)))
     pass

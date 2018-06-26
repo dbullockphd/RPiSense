@@ -1,5 +1,5 @@
 #!/bin/sh
 
-export RPiSenseDir=/home/pi/src/RPiSense
-export PATH=$RPiSenseDir/macros:$PATH
-export PYTHONPATH=$RPiSenseDir/python:$PYTHONPATH
+export RPiSenseSYS=/home/pi/src/RPiSense
+export PATH=$RPiSenseSYS/macros:$PATH
+export PYTHONPATH=$RPiSenseSYS/python:$PYTHONPATH
