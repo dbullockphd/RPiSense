@@ -82,4 +82,4 @@ echo "source /home/pi/src/RPiSense/setup.sh" >> /home/pi/.bash_aliases
 
 ## Additional Documentation
 
-This README file is just to help you get the installation working. A more comprehensive documentation can be found at [].
+This README file is just to help you get the installation working. A more comprehensive documentation can be found at https://dbullockphd.github.io/RPiSense/html/.

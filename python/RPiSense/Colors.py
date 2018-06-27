@@ -123,7 +123,7 @@ class Colors (object):
         f = where (self.colors['name'] == key)
         if len(f[0]) == 0: raise ValueError ('color {0:s} unknown'.format(key))
         i = f[0][0]
-        abc = self.__get (i, mode)
+        name, abc = self.__get (i, mode)
         return abc
 
     def __get (self, i, mode):
