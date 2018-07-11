@@ -21,25 +21,21 @@ class Colors (object):
 
     def __init__ (self, order=('H','L','S'), ascending=True):
         self.colors = genfromtxt (self.__colorscsv,
-                                  dtype=[('r',uint8), ('g',uint8), ('b',uint8),
-                                         ('h',uint8), ('s',uint8), ('v',uint8),
-                                         ('H',uint8), ('L',uint8), ('S',uint8),
-                                         ('name',object)],
+                                  dtype=[
+                                      ('name',object),
+                                      ('r',uint8), ('g',uint8), ('b',uint8),
+                                      ('h',uint8), ('s',uint8), ('v',uint8),
+                                      ('H',uint8), ('L',uint8), ('S',uint8),
+                                  ],
                                   delimiter=',')
 
         # sort by columns
         self.colors.sort (kind='mergesort', order=order)
         pass
 
-    def random (self, low=-1, high=-1, mode='rgb'):
+    def random (self, mode='rgb'):
         """
         Select a color at random.
-
-        :param low: (`integer`)
-            The lowest index of the array to use. If `low=-1`, this defaults to the first index.
-
-        :param high: (`integer`)
-            The highest index of the array to use. If `high=-1`, this defaults to the last index.
 
         :param mode: ('string')
             This is a 3-character description for the color category to return. Valid options are 'rgb' (red, green, blue), 'hsv' (hue, saturation, value), and 'HLS' (HUE, LUMINOSITY, SATURATION).
@@ -52,21 +48,13 @@ class Colors (object):
         """
         
         # pick a random color between low and high
-        if low < 0: low = 0
-        if high < 0: high = self.colors.shape[0]
-        i = randint (low, high-1)
+        i = randint (0, self.colors.shape[0]-1)
         name, abc = self.__get (i, mode)
         return name, abc
 
-    def randomColor (self, low=-1, high=-1, mode='rgb'):
+    def randomColor (self, mode='rgb'):
         """
         Select a color at random.
-
-        :param low: (`integer`)
-            The lowest index of the array to use. If `low=-1`, this defaults to the first index.
-
-        :param high: (`integer`)
-            The highest index of the array to use. If `high=-1`, this defaults to the last index.
 
         :param mode: ('string')
             This is a 3-character description for the color category to return. Valid options are 'rgb' (red, green, blue), 'hsv' (hue, saturation, value), and 'HLS' (HUE, LUMINOSITY, SATURATION).
@@ -77,18 +65,12 @@ class Colors (object):
         """
 
         # get the tuple from the random method
-        name, abc = self.random (low, high, mode)
+        name, abc = self.random (mode)
         return abc
 
-    def randomName (self, low=-1, high=-1, mode='rgb'):
+    def randomName (self, mode='rgb'):
         """
         Select a color at random.
-
-        :param low: (`integer`)
-            The lowest index of the array to use. If `low=-1`, this defaults to the first index.
-
-        :param high: (`integer`)
-            The highest index of the array to use. If `high=-1`, this defaults to the last index.
 
         :param mode: ('string')
             This is a 3-character description for the color category to return. Valid options are 'rgb' (red, green, blue), 'hsv' (hue, saturation, value), and 'HLS' (HUE, LUMINOSITY, SATURATION).
@@ -101,7 +83,7 @@ class Colors (object):
         """
 
         # get the name from the random method
-        name, abc = self.random (low, high, mode)
+        name, abc = self.random (mode)
         return name
 
     def fetch (self, key, mode='rgb'):
